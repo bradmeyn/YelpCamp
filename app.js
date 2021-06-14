@@ -1,4 +1,6 @@
 const express = require('express');
+//use express
+const app = express();
 const path = require('path');
 
 const mongoose = require('mongoose');
@@ -6,9 +8,12 @@ const ejsMate = require('ejs-mate');
 const ExpressError = require('./utils/ExpressError');
 
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+//override post routes for form submission
 const methodOverride = require('method-override');
 
-
+//routes files
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
 
@@ -16,7 +21,8 @@ const reviews = require('./routes/reviews');
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 });
 
 
@@ -27,8 +33,7 @@ db.once('open', () => {
     console.log("database connected");
 });
 
-//use express
-const app = express();
+
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
