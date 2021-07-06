@@ -1,61 +1,59 @@
 
-//file is used to fill database with seed/filler entries of fake campsites
-
-
-
 const mongoose = require('mongoose');
 const cities = require('./cities');
-const {places, descriptors} = require('./seedHelpers');
-const Campground = require ('../models/campground');
+const { places, descriptors } = require('./seedHelpers');
+const Campground = require('../models/campground');
 
-
-//connect mongoose to mongodb server
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
 });
 
-
-//confirm database connection
 const db = mongoose.connection;
-db.on('error',console.error.bind('connection error:'));
-db.once('open', () => {
-    console.log("database connected");
+
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+    console.log("Database connected");
 });
 
-//helper function to select a random array item
 const sample = array => array[Math.floor(Math.random() * array.length)];
 
-//delete existing database data and refill with generic options
+
 const seedDB = async () => {
     await Campground.deleteMany({});
-    for (let i = 0; i < 50; i++){
+    for (let i = 0; i < 400; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
         const camp = new Campground({
+            //YOUR USER ID
             author: '60dd68d729208b10d3fdf13f',
-            title: `${sample(descriptors)} ${sample(places)}`,
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam faucibus purus lorem, et blandit libero mattis in. Cras lobortis magna lorem, sit amet blandit purus fringilla vel. Donec blandit aliquet ipsum ac mattis. Sed vehicula nisl justo, sit amet blandit mi eleifend eu. Proin vitae tempor ipsum. Nulla facilisi. Aenean auctor lectus ligula, ac finibus neque accumsan hendrerit. Nullam vel congue lacus, a scelerisque massa. Aenean blandit, magna sit amet semper ullamcorper, erat enim luctus nulla, sit amet pulvinar est risus nec urna. Quisque mauris massa, semper sed fermentum vitae, congue aliquet odio. Nullam lectus ipsum, rhoncus id lectus vitae, porttitor pretium nunc. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Duis a volutpat felis.',
+            title: `${sample(descriptors)} ${sample(places)}`,
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam dolores vero perferendis laudantium, consequuntur voluptatibus nulla architecto, sit soluta esse iure sed labore ipsam a cum nihil atque molestiae deserunt!',
             price,
-            images:[
+            geometry: {
+                type: "Point",
+                coordinates: [
+                    cities[random1000].longitude,
+                    cities[random1000].latitude
+                ]
+            },
+            images: [
                 {
-                    url: 'https://res.cloudinary.com/dzkirdhwv/image/upload/v1625123079/YelpCamp/odfb2vprycq85zwdbttj.jpg',
-                    filename: 'YelpCamp/odfb2vprycq85zwdbttj'
-                  },
-                  {
                     url: 'https://res.cloudinary.com/dzkirdhwv/image/upload/v1625123086/YelpCamp/lstqb0rwa2f5gwstlhet.jpg',
                     filename: 'YelpCamp/lstqb0rwa2f5gwstlhet'
+                  },
+                  {
+                    url: 'https://res.cloudinary.com/dzkirdhwv/image/upload/v1625358419/YelpCamp/jgtscay5fxbhxmye54tp.jpg',
+                    filename: 'YelpCamp/jgtscay5fxbhxmye54tp'
                   }
             ]
-        });
+        })
         await camp.save();
     }
-    
 }
-    
 
-seedDB().then(()=> {
+seedDB().then(() => {
     mongoose.connection.close();
 })
